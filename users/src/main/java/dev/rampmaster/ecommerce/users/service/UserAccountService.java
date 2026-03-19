@@ -1,11 +1,12 @@
 package dev.rampmaster.ecommerce.users.service;
 
-import dev.rampmaster.ecommerce.users.model.UserAccount;
-import dev.rampmaster.ecommerce.users.repository.UserAccountRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import dev.rampmaster.ecommerce.users.model.UserAccount;
+import dev.rampmaster.ecommerce.users.repository.UserAccountRepository;
 
 @Service
 public class UserAccountService {
@@ -43,6 +44,10 @@ public class UserAccountService {
         }
         repository.deleteById(id);
         return true;
+    }
+
+    public Optional<UserAccount> findByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }
 

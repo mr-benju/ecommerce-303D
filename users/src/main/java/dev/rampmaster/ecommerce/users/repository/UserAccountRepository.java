@@ -45,5 +45,11 @@ public class UserAccountRepository {
     public void deleteById(Long id) {
         storage.remove(id);
     }
+
+    public Optional<UserAccount> findByEmail(String email) {
+        return storage.values().stream()
+                .filter(user -> user.getEmail() != null && user.getEmail().equals(email))
+                .findFirst();
+    }
 }
 

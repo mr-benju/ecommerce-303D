@@ -5,18 +5,29 @@ public class UserAccount {
     private Long id;
     private String username;
     private String email;
+    private String password;
     private String role;
     private boolean active;
 
     public UserAccount() {
     }
 
-    public UserAccount(Long id, String username, String email, String role, boolean active) {
+    public UserAccount(Long id, String username, String email, String password, String role, boolean active) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.password = password;
         this.role = role;
         this.active = active;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+
     }
 
     public Long getId() {
