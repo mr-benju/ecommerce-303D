@@ -2,10 +2,9 @@ package dev.rampmaster.ecommerce.users.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
-
 import dev.rampmaster.ecommerce.users.model.UserAccount;
+import dev.rampmaster.ecommerce.users.model.Role; 
 import dev.rampmaster.ecommerce.users.repository.UserAccountRepository;
 
 @Service
@@ -17,6 +16,20 @@ public class UserAccountService {
         this.repository = repository;
     }
 
+    // --- Lógica de Permisos (RBAC) ---
+    
+    public boolean canDeleteUser(Role requesterRole) {
+        // Solo el ADMIN tiene permisos de eliminación
+        return Role.ADMIN.equals(requesterRole);
+    }
+
+    public boolean canViewAll(Role requesterRole) {
+        // ADMIN y SUPPORT pueden visualizar la lista completa de cuentas
+        return Role.ADMIN.equals(requesterRole) || Role.SUPPORT.equals(requesterRole);
+    }
+
+    // --- Métodos CRUD ---
+
     public List<UserAccount> findAll() {
         return repository.findAll();
     }
@@ -26,7 +39,10 @@ public class UserAccountService {
     }
 
     public UserAccount create(UserAccount entity) {
-        entity.setId(null);
+        // Si no se especifica rol, se asigna COSTUMER por defecto
+        if (entity.getRole() == null) {
+            entity.setRole(Role.COSTUMER);
+        }
         return repository.save(entity);
     }
 
@@ -50,4 +66,3 @@ public class UserAccountService {
         return repository.findByEmail(email);
     }
 }
-

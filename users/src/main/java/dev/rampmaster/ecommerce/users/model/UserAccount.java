@@ -6,28 +6,19 @@ public class UserAccount {
     private String username;
     private String email;
     private String password;
-    private String role;
+    private Role role; // Cambiado de String a Role
     private boolean active;
 
     public UserAccount() {
     }
 
-    public UserAccount(Long id, String username, String email, String password, String role, boolean active) {
+    public UserAccount(Long id, String username, String email, String password, Role role, boolean active) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
         this.active = active;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-
     }
 
     public Long getId() {
@@ -54,11 +45,19 @@ public class UserAccount {
         this.email = email;
     }
 
-    public String getRole() {
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Role getRole() { // Ahora devuelve un Role
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) { // Ahora recibe un Role
         this.role = role;
     }
 
@@ -70,4 +69,3 @@ public class UserAccount {
         this.active = active;
     }
 }
-

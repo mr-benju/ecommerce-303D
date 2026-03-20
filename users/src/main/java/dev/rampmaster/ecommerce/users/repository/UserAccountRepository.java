@@ -6,10 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
 import org.springframework.stereotype.Repository;
-
 import dev.rampmaster.ecommerce.users.model.UserAccount;
+import dev.rampmaster.ecommerce.users.model.Role; // IMPORTANTE: Importar el Enum
 
 @Repository
 public class UserAccountRepository {
@@ -18,9 +17,10 @@ public class UserAccountRepository {
     private final AtomicLong sequence = new AtomicLong(0);
 
     public UserAccountRepository() {
-        save(new UserAccount(null, "admin", "admin@ecommerce.dev", "admin123", "ADMIN", true));
-        save(new UserAccount(null, "buyer01", "buyer01@ecommerce.dev", "buyer123", "CUSTOMER", true));
-        save(new UserAccount(null, "support01", "support@ecommerce.dev", "support123", "SUPPORT", true));
+        // CORRECCIÓN: Usar Role.ADMIN, Role.COSTUMER, etc., en lugar de Strings
+        save(new UserAccount(null, "admin", "admin@ecommerce.dev", "admin123", Role.ADMIN, true));
+        save(new UserAccount(null, "buyer01", "buyer01@ecommerce.dev", "buyer123", Role.COSTUMER, true));
+        save(new UserAccount(null, "support01", "support@ecommerce.dev", "support123", Role.SUPPORT, true));
     }
 
     public List<UserAccount> findAll() {
@@ -53,4 +53,3 @@ public class UserAccountRepository {
                 .findFirst();
     }
 }
-

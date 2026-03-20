@@ -1,19 +1,13 @@
 package dev.rampmaster.ecommerce.users.controller;
 
 import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import dev.rampmaster.ecommerce.users.model.UserAccount;
+import dev.rampmaster.ecommerce.users.model.LoginRequest;
+import dev.rampmaster.ecommerce.users.model.Role;
 import dev.rampmaster.ecommerce.users.service.UserAccountService;
 
 @RestController
@@ -26,9 +20,14 @@ public class UserAccountController {
         this.service = service;
     }
 
-    @GetMapping
-    public List<UserAccount> findAll() {
-        return service.findAll();
+    // Obtener todos los usuarios (Requiere ADMIN o SUPPORT)
+    @GetMapping("/all")
+    public ResponseEntity<?> findAll(@RequestHeader(value = "X-User-Role", defaultValue = "COSTUMER") Role role) {
+        if (!service.canViewAll(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Acceso denegado: Se requiere rol ADMIN o SUPPORT.");
+        }
+        return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
@@ -50,23 +49,29 @@ public class UserAccountController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Borrar usuario (Solo ADMINISTRADOR)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id, 
+                                    @RequestHeader(value = "X-User-Role", defaultValue = "COSTUMER") Role role) {
+        if (!service.canDeleteUser(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Acceso denegado: Solo el ADMINISTRADOR tiene permisos para eliminar registros.");
+        }
+
         if (!service.delete(id)) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoint específico para el Login
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserAccount loginRequest) {
-        return service.findByEmail(loginRequest.getEmail())
-                .filter(user -> user.getPassword() != null && 
-                        user.getPassword().equals(loginRequest.getPassword()))
-                .map(user -> ResponseEntity.ok("Login exitoso. Token: JWT_SIMULADO_12345"))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Credenciales incorrectas"));
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) { // Cambiado aquí
+    return service.findByEmail(loginRequest.getEmail())
+            .filter(user -> user.getPassword() != null && 
+                    user.getPassword().equals(loginRequest.getPassword()))
+            .map(user -> ResponseEntity.ok("Login exitoso. Bienvenido " + user.getUsername() + 
+                                           ". Tu rol es: " + user.getRole()))
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Credenciales incorrectas"));
     }
-
 }
